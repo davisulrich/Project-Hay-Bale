@@ -19,4 +19,4 @@ function game() {
   enemyController.draw(ctx);
 }
 
-setInterval(game, 10000);
+setInterval(game, 1000);
