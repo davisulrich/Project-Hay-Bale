@@ -22,12 +22,20 @@ export default class EnemyController {
       row.forEach((enemyNumber, enemyIndex) => {
         if (enemyNumber > 0) {
           this.enemyRows[rowIndex].push(
-            new Enemy(enemyIndex * 50, rowIndex * 35, enemyNumber)
+            new Enemy(5 + enemyIndex * 60, rowIndex * 45, enemyNumber)
           );
         }
       });
     });
   }
 
-  draw() {}
+  draw(ctx) {
+    this.drawEnemies(ctx);
+  }
+
+  drawEnemies(ctx) {
+    this.enemyRows.flat().forEach((enemy) => {
+      enemy.draw(ctx);
+    });
+  }
 }
