@@ -11,11 +11,17 @@ export default class EnemyController {
     [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
   ];
   enemyRows = [];
+
   currentDirection = movingDirection.right;
+
   xVelocity = 0;
   yVelocity = 0;
-  defaultXVelocity = 1;
-  defaultYVelocity = 1;
+  defaultXVelocity = 20;
+  defaultYVelocity = 20;
+
+  // for counting how long the enemies move down then change directions
+  moveDownTimerDefault = 30;
+  moveDownTimer = this.moveDownTimer;
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -42,11 +48,25 @@ export default class EnemyController {
 
   updateVelocityAndDirection() {
     for (const enemyRow of this.enemyRows) {
-      if (enemyRow.movingDirection === movingDirection.right) {
-        enemyRow.xVelocity = enemyRow.defaultXVelocity;
-        enemyRow.yVelocity = 0;
+      if (this.currentDirection === movingDirection.right) {
+        this.xVelocity = this.defaultXVelocity;
+        this.yVelocity = 0;
+
+        const rightMostEnemy = enemyRow[enemyRow.length - 1];
+        if (rightMostEnemy.x + rightMostEnemy.width + 5 >= this.canvas.width) {
+          this.currentDirection = movingDirection.downLeft;
+
+          break;
+        }
+      } else if (this.currentDirection === movingDirection.downLeft) {
+        this.moveDown(movingDirection.left);
       }
     }
+  }
+
+  moveDown(newDirection) {
+    this.xVelocity = 0;
+    this.yVelocity = this.defaultYVelocity;
   }
 
   drawEnemies(ctx) {

@@ -1,4 +1,4 @@
-// https://www.youtube.com/watch?v=qCBiKJbLcFI
+// https://www.youtube.com/watch?v=qCBiKJbLcFI 28.05
 
 import EnemyController from "/src/enemyController.js";
 
@@ -19,4 +19,4 @@ function game() {
   enemyController.draw(ctx);
 }
 
-setInterval(game, 1000);
+setInterval(game, 5000);
