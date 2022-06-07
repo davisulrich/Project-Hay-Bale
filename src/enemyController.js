@@ -16,12 +16,12 @@ export default class EnemyController {
 
   xVelocity = 0;
   yVelocity = 0;
-  defaultXVelocity = 20;
-  defaultYVelocity = 20;
+  defaultXVelocity = 1;
+  defaultYVelocity = 1;
 
   // for counting how long the enemies move down then change directions
   moveDownTimerDefault = 30;
-  moveDownTimer = this.moveDownTimer;
+  moveDownTimer = this.moveDownTimerDefault;
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -42,8 +42,11 @@ export default class EnemyController {
   }
 
   draw(ctx) {
+    this.decrementMoveDownTimer();
     this.updateVelocityAndDirection();
     this.drawEnemies(ctx);
+    this.resetMoveDownTimer();
+    console.log(this.moveDownTimer);
   }
 
   updateVelocityAndDirection() {
@@ -55,11 +58,15 @@ export default class EnemyController {
         const rightMostEnemy = enemyRow[enemyRow.length - 1];
         if (rightMostEnemy.x + rightMostEnemy.width + 5 >= this.canvas.width) {
           this.currentDirection = movingDirection.downLeft;
-
           break;
         }
       } else if (this.currentDirection === movingDirection.downLeft) {
-        this.moveDown(movingDirection.left);
+        if (this.moveDown(movingDirection.left)) {
+          break;
+        }
+      } else if (this.currentDirection === movingDirection.left) {
+        this.xVelocity = -this.defaultXVelocity;
+        this.yVelocity = 0;
       }
     }
   }
@@ -67,6 +74,11 @@ export default class EnemyController {
   moveDown(newDirection) {
     this.xVelocity = 0;
     this.yVelocity = this.defaultYVelocity;
+    if (this.moveDownTimer <= 0) {
+      this.currentDirection = newDirection;
+      return true;
+    }
+    return false;
   }
 
   drawEnemies(ctx) {
@@ -74,5 +86,22 @@ export default class EnemyController {
       enemy.move(this.xVelocity, this.yVelocity);
       enemy.draw(ctx);
     });
+  }
+
+  // when the enemies are moving down, decrement the timer
+  decrementMoveDownTimer() {
+    if (
+      this.currentDirection === movingDirection.downLeft ||
+      this.currentDirection === movingDirection.downRight
+    ) {
+      this.moveDownTimer--;
+    }
+  }
+
+  // when the enemies should stop moving down, reset the timer
+  resetMoveDownTimer() {
+    if (this.moveDownTimer <= 0) {
+      this.moveDownTimer = this.moveDownTimerDefault;
+    }
   }
 }
