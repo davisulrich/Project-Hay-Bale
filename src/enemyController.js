@@ -34,7 +34,7 @@ export default class EnemyController {
       row.forEach((enemyNumber, enemyIndex) => {
         if (enemyNumber > 0) {
           this.enemyRows[rowIndex].push(
-            new Enemy(5 + enemyIndex * 55, rowIndex * 45, enemyNumber)
+            new Enemy(5 + enemyIndex * 55, rowIndex * 50, enemyNumber)
           );
         }
       });
@@ -67,6 +67,15 @@ export default class EnemyController {
       } else if (this.currentDirection === movingDirection.left) {
         this.xVelocity = -this.defaultXVelocity;
         this.yVelocity = 0;
+        const leftMostEnemy = enemyRow[0];
+        if (leftMostEnemy.x - 5 <= 0) {
+          this.currentDirection = movingDirection.downRight;
+          break;
+        }
+      } else if (this.currentDirection === movingDirection.downRight) {
+        if (this.moveDown(movingDirection.right)) {
+          break;
+        }
       }
     }
   }

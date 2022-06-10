@@ -9,7 +9,7 @@ canvas.width = 600;
 canvas.height = 500;
 
 const background = new Image();
-background.src = "src/images/purple-stars.jpg";
+background.src = "src/images/pixel_stars.jpg";
 
 const enemyController = new EnemyController(canvas);
 
