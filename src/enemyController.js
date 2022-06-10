@@ -46,7 +46,6 @@ export default class EnemyController {
     this.updateVelocityAndDirection();
     this.drawEnemies(ctx);
     this.resetMoveDownTimer();
-    console.log(this.moveDownTimer);
   }
 
   updateVelocityAndDirection() {
