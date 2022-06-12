@@ -11,7 +11,8 @@ export default class BulletController {
     this.bulletType = bulletType;
 
     this.shootSound = new Audio("/src/audio/" + bulletType + "_laser.ogg");
-    this.shootSound.volume = 0.1;
+    if (this.bulletType === "enemy") this.shootSound.volume = 0.0;
+    else this.shootSound.volume = 0.1;
   }
 
   shoot(x, y, velocity, timeTillNextBullet = 3) {
@@ -26,6 +27,17 @@ export default class BulletController {
 
       this.timeTillNextBullet = timeTillNextBullet;
     }
+  }
+
+  collideWith(sprite) {
+    const bulletThatHitSpriteIndex = this.bullets.findIndex((bullet) =>
+      bullet.bulletCollide(sprite)
+    );
+    if (bulletThatHitSpriteIndex >= 0) {
+      this.bullets.splice(bulletThatHitSpriteIndex, 1);
+      return true;
+    }
+    return false;
   }
 
   draw(ctx) {

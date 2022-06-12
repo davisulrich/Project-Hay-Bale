@@ -26,9 +26,10 @@ export default class EnemyController {
   moveDownTimerDefault = 30;
   moveDownTimer = this.moveDownTimerDefault;
 
-  constructor(canvas, enemyBulletController) {
+  constructor(canvas, enemyBulletController, playerBulletController) {
     this.canvas = canvas;
     this.enemyBulletController = enemyBulletController;
+    this.playerBulletController = playerBulletController;
     this.createEnemies();
   }
 
@@ -48,9 +49,27 @@ export default class EnemyController {
   draw(ctx) {
     this.decrementMoveDownTimer();
     this.updateVelocityAndDirection();
+    this.collisionDetection();
     this.drawEnemies(ctx);
     this.resetMoveDownTimer();
     this.fireBullet();
+  }
+
+  collisionDetection() {
+    this.enemyRows.forEach((enemyRow) => {
+      enemyRow.forEach((enemy, enemyIndex) => {
+        if (this.playerBulletController.collideWith(enemy)) {
+          // play audio
+          this.enemyDeathSound = new Audio("/src/audio/enemy_death.ogg");
+          this.enemyDeathSound.volume = 0.07;
+          this.enemyDeathSound.currentTime = 0;
+          this.enemyDeathSound.play();
+
+          enemyRow.splice(enemyIndex, 1);
+        }
+      });
+    });
+    this.enemyRows = this.enemyRows.filter((enemyRow) => enemyRow.length > 0);
   }
 
   fireBullet() {
@@ -60,7 +79,11 @@ export default class EnemyController {
       const allEnemies = this.enemyRows.flat();
       const enemyIndex = Math.floor(Math.random() * allEnemies.length);
       const enemy = allEnemies[enemyIndex];
-      this.enemyBulletController.shoot(enemy.x + enemy.width/2, enemy.y, -4)
+      this.enemyBulletController.shoot(
+        enemy.x + enemy.width / 2,
+        enemy.y + enemy.height,
+        -4
+      );
     }
   }
 

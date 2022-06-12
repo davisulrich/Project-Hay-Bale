@@ -1,4 +1,4 @@
-// https://www.youtube.com/watch?v=qCBiKJbLcFI 56:53
+// https://www.youtube.com/watch?v=qCBiKJbLcFI 101:53
 
 import EnemyController from "/src/enemyController.js";
 import Player from "/src/player.js";
@@ -22,7 +22,11 @@ const playerBulletController = new BulletController(
 );
 const enemyBulletController = new BulletController(canvas, 4, "red", "enemy");
 
-const enemyController = new EnemyController(canvas, enemyBulletController);
+const enemyController = new EnemyController(
+  canvas,
+  enemyBulletController,
+  playerBulletController
+);
 const player = new Player(canvas, 18, playerBulletController);
 
 // game loop
@@ -34,4 +38,4 @@ function game() {
   enemyBulletController.draw(ctx);
 }
 
-setInterval(game, 10000 / 20);
+setInterval(game, 1000 / 20);
