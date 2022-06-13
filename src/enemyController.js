@@ -19,12 +19,17 @@ export default class EnemyController {
   defaultXVelocity = 1;
   defaultYVelocity = 1;
 
+  fireBulletTimerDefault = 25;
+  fireBulletTimer = this.fireBulletTimerDefault;
+
   // for counting how long the enemies move down then change directions
   moveDownTimerDefault = 30;
   moveDownTimer = this.moveDownTimerDefault;
 
-  constructor(canvas) {
+  constructor(canvas, enemyBulletController, playerBulletController) {
     this.canvas = canvas;
+    this.enemyBulletController = enemyBulletController;
+    this.playerBulletController = playerBulletController;
     this.createEnemies();
   }
 
@@ -34,7 +39,7 @@ export default class EnemyController {
       row.forEach((enemyNumber, enemyIndex) => {
         if (enemyNumber > 0) {
           this.enemyRows[rowIndex].push(
-            new Enemy(5 + enemyIndex * 55, rowIndex * 45, enemyNumber)
+            new Enemy(5 + enemyIndex * 55, rowIndex * 50, enemyNumber)
           );
         }
       });
@@ -44,9 +49,42 @@ export default class EnemyController {
   draw(ctx) {
     this.decrementMoveDownTimer();
     this.updateVelocityAndDirection();
+    this.collisionDetection();
     this.drawEnemies(ctx);
     this.resetMoveDownTimer();
-    console.log(this.moveDownTimer);
+    this.fireBullet();
+  }
+
+  collisionDetection() {
+    this.enemyRows.forEach((enemyRow) => {
+      enemyRow.forEach((enemy, enemyIndex) => {
+        if (this.playerBulletController.collideWith(enemy)) {
+          // play audio
+          this.enemyDeathSound = new Audio("/src/audio/enemy_death.ogg");
+          this.enemyDeathSound.volume = 0.07;
+          this.enemyDeathSound.currentTime = 0;
+          this.enemyDeathSound.play();
+
+          enemyRow.splice(enemyIndex, 1);
+        }
+      });
+    });
+    this.enemyRows = this.enemyRows.filter((enemyRow) => enemyRow.length > 0);
+  }
+
+  fireBullet() {
+    this.fireBulletTimer--;
+    if (this.fireBulletTimer <= 0) {
+      this.fireBulletTimer = this.fireBulletTimerDefault;
+      const allEnemies = this.enemyRows.flat();
+      const enemyIndex = Math.floor(Math.random() * allEnemies.length);
+      const enemy = allEnemies[enemyIndex];
+      this.enemyBulletController.shoot(
+        enemy.x + enemy.width / 2,
+        enemy.y + enemy.height,
+        -4
+      );
+    }
   }
 
   updateVelocityAndDirection() {
@@ -67,6 +105,15 @@ export default class EnemyController {
       } else if (this.currentDirection === movingDirection.left) {
         this.xVelocity = -this.defaultXVelocity;
         this.yVelocity = 0;
+        const leftMostEnemy = enemyRow[0];
+        if (leftMostEnemy.x - 5 <= 0) {
+          this.currentDirection = movingDirection.downRight;
+          break;
+        }
+      } else if (this.currentDirection === movingDirection.downRight) {
+        if (this.moveDown(movingDirection.right)) {
+          break;
+        }
       }
     }
   }
